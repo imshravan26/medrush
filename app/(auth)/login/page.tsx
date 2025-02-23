@@ -16,8 +16,12 @@ export default function Login() {
       // Redirect to mode selection page after successful login
       console.log("Login successful", user);
       router.push("/");
-    } catch (err) {
-      setError(err.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 

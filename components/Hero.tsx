@@ -1,10 +1,37 @@
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+"use client";
 
-export default function Hero() {
+import { useState, useEffect } from "react";
+import { Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import medicines from "@/data/medicines.json";
+
+export default function Hero({ onSearch }) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      const filteredMedicines = medicines.filter(
+        (medicine) =>
+          medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          medicine.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      onSearch(filteredMedicines);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, onSearch]);
+
+  const handleInputChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleClear = () => {
+    setSearchTerm("");
+    onSearch(medicines);
+  };
+
   return (
     <div className="h-[90vh] flex flex-col items-center justify-center px-4">
-      {/* Container for SVG and text */}
       <div className="flex flex-col items-center p-6">
         <svg
           width="321"
@@ -815,15 +842,21 @@ export default function Hero() {
           </p>
         </div>
       </div>
-
-      {/* Search input container */}
       <div className="w-full max-w-2xl p-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             placeholder="Search medicines..."
-            className="pl-10 w-full border-gray-300 focus:ring-blue-500"
+            className="pl-10 pr-10 w-full border-gray-300 focus:ring-blue-500"
+            value={searchTerm}
+            onChange={handleInputChange}
           />
+          {searchTerm && (
+            <X
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={handleClear}
+            />
+          )}
         </div>
       </div>
     </div>
